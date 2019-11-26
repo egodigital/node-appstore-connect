@@ -1,0 +1,46 @@
+{
+  "name": "appstore-connect",
+  "version": "0.1.0",
+  "description": "API client for Apple App Store Connect API.",
+  "main": "lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/egodigital/node-appstore-connect.git"
+  },
+  "keywords": [
+    "apple",
+    "app",
+    "store",
+    "connect",
+    "rest",
+    "api",
+    "client"
+  ],
+  "author": "e.GO Digital GmbH, Aachen, Germany",
+  "license": "LGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/egodigital/node-appstore-connect/issues"
+  },
+  "homepage": "https://github.com/egodigital/node-appstore-connect#readme",
+  "devDependencies": {
+    "@egodigital/tsconfig": "^1.3.0",
+    "@types/got": "^9.6.9",
+    "@types/jsonwebtoken": "^8.3.5",
+    "@types/node": "^10.17.6",
+    "tslint": "^5.20.1",
+    "typedoc": "^0.15.2",
+    "typescript": "^3.7.2"
+  },
+  "dependencies": {
+    "csv-parser": "^2.3.2",
+    "got": "^9.6.0",
+    "jsonwebtoken": "^8.5.1",
+    "moment": "^2.24.0"
+  },
+  "scripts": {
+    "build": "(rm -r ./lib || true) && tsc && tsc -d",
+    "deploy": "npm install && npm run build && npm publish",
+    "doc": "(rm -r ./doc || true) && (typedoc --out ./doc ./src)",
+    "sandbox": "npm run build && node ./lib/sandbox.js"
+  }
+}
