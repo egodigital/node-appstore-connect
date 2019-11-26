@@ -1,5 +1,5 @@
-# Change Log (@egodigital/node-appstore-connect)
+# Change Log (@egodigital/appstore-connect)
 
-## 0.1.0
+## 0.1.2
 
 * initial release
