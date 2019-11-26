@@ -1,6 +1,6 @@
-[![npm](https://img.shields.io/npm/v/appstore-connect.svg)](https://www.npmjs.com/package/appstore-connect)
+[![npm](https://img.shields.io/npm/v/@egodigital/appstore-connect.svg)](https://www.npmjs.com/package/@egodigital/appstore-connect)
 
-# appstore-connect
+# @egodigital/appstore-connect
 
 A simplfied library for [Node.js 10+](https://nodejs.org/docs/latest-v10.x/api/) for accessing [Apple's App Store Connect API](https://developer.apple.com/documentation/appstoreconnectapi), written in [TypeScript](https://www.typescriptlang.org/).
 
@@ -11,14 +11,14 @@ The module is quite new, so [issues](https://github.com/egodigital/node-appstore
 Execute the following command from your project folder, where your `package.json` file is stored:
 
 ```bash
-npm install --save appstore-connect
+npm install --save @egodigital/appstore-connect
 ```
 
 ## Usage
 
 ```typescript
 import * as fs from 'fs';
-import { Client as AppStoreConnectClient } from 'appstore-connect';
+import { Client as AppStoreConnectClient } from '@egodigital/appstore-connect';
 
 const PRIVATE_KEY = fs.readFileSync(
     '/path/to/your/p8/file'  // downloaded from https://appstoreconnect.apple.com/access/api

@@ -1,5 +1,5 @@
 {
-  "name": "appstore-connect",
+  "name": "@egodigital/appstore-connect",
   "version": "0.1.0",
   "description": "API client for Apple App Store Connect API.",
   "main": "lib/index.js",

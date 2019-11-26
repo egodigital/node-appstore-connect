@@ -1,4 +1,4 @@
-# Change Log (node-appstore-connect)
+# Change Log (@egodigital/node-appstore-connect)
 
 ## 0.1.0
 
