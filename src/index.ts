@@ -221,7 +221,7 @@ export class Client {
             frequency = DownloadSalesReportFrequency.Weekly;
         }
 
-        let filterReportDate;
+        let filterReportDate: string;
         switch (frequency) {
             case DownloadSalesReportFrequency.Weekly:
                 reportDate = moment(reportDate.toDate()).endOf('isoWeek');
