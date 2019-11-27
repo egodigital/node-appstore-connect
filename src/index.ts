@@ -229,13 +229,15 @@ export class Client {
                 break;
 
             case DownloadSalesReportFrequency.Monthly:
-                reportDate = moment(reportDate.toDate());
                 filterReportDate = reportDate.format('YYYY-MM');
                 break;
 
             case DownloadSalesReportFrequency.Yearly:
-                reportDate = moment(reportDate.toDate());
                 filterReportDate = reportDate.format('YYYY');
+                break;
+
+            default:
+                filterReportDate = reportDate.format('YYYY-MM-DD');
                 break;
         }
 
