@@ -31,7 +31,6 @@ const CLIENT = new AppStoreConnectClient({
 });
 
 const SUMMARY = await CLIENT.getAppDownloads({
-    date: moment(),
     frequency: DownloadSalesReportFrequency.Weekly,
     vendorId: '<YOUR-VENDOR-ID>',  // s. https://appstoreconnect.apple.com/itc/payments_and_financial_reports
 });

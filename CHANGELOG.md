@@ -1,6 +1,6 @@
 # Change Log (@egodigital/appstore-connect)
 
-## 0.1.3
+## 0.1.4
 
 * bug fixes
 
