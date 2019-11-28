@@ -43,8 +43,6 @@ export interface ClientOptions {
     privateKey: PrivateKey;
 }
 
-// , YEARLY
-
 /**
  * The frequence of a report.
  */

@@ -1,6 +1,6 @@
 {
   "name": "@egodigital/appstore-connect",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": false,
   "description": "API client for Apple App Store Connect API.",
   "main": "lib/index.js",
