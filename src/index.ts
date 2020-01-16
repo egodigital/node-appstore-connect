@@ -15,7 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as got from 'got';
+import got from 'got';
 import * as jwt from 'jsonwebtoken';
 import * as moment from 'moment';
 import { gunzip, isNil, readCSV } from './utils';
@@ -28,19 +28,19 @@ export interface ClientOptions {
     /**
      * The API key.
      */
-    apiKey: string;
+    'apiKey': string;
     /**
      * The number in sec, the token will expire. Default: 1200
      */
-    expriresIn?: number;
+    'expriresIn'?: number;
     /**
      * The ID of the issuer.
      */
-    issuerId: string;
+    'issuerId': string;
     /**
      * The private key.
      */
-    privateKey: PrivateKey;
+    'privateKey': PrivateKey;
 }
 
 /**
@@ -66,21 +66,34 @@ export enum DownloadSalesReportFrequency {
 }
 
 /**
+ * A filter for a 'SalesReportRow' item.
+ * 
+ * @param {SalesReportRow} row The current item / row.
+ * 
+ * @return {boolean|PromiseLike<boolean>} The result, that indicates if filter criteria matches or not.
+ */
+export type SalesReportRowFilter = (row: SalesReportRow) => boolean | PromiseLike<boolean>;
+
+/**
  * Options for 'Client.downloadSalesReportSummary()' method.
  */
 export interface DownloadSalesReportSummaryOptions {
     /**
      * The custom report date.
      */
-    date?: moment.MomentInput;
+    'date'?: moment.MomentInput;
+    /**
+     * A filter for a sales report row.
+     */
+    'filter'?: SalesReportRowFilter;
     /**
      * The frequency. Default: Weekly.
      */
-    frequency?: DownloadSalesReportFrequency;
+    'frequency'?: DownloadSalesReportFrequency;
     /**
      * The ID of the vendor.
      */
-    vendorId: string;
+    'vendorId': string;
 }
 
 /**
@@ -96,7 +109,7 @@ export interface GetAppDownloadsResult {
     /**
      * The list of apps.
      */
-    apps: { [appId: string]: GetAppDownloadsAppItem };
+    'apps': { [appId: string]: GetAppDownloadsAppItem };
 }
 
 /**
@@ -106,7 +119,7 @@ export interface GetAppDownloadsAppItem {
     /**
      * The number of downloads.
      */
-    downloads: number;
+    'downloads': number;
 }
 
 /**
@@ -153,7 +166,7 @@ export interface SalesReportRow {
  * A client for the App Store Connect API.
  */
 export class Client {
-    private _bearerToken: string;
+    private _bearerToken: string | undefined;
 
     /**
      * Initializes a new instance of that class.
@@ -174,17 +187,17 @@ export class Client {
             }
 
             const PAYLOAD = {
-                "iss": this.options.issuerId,
-                "exp": NOW + expriresIn,
-                "aud": "appstoreconnect-v1"
+                'iss': this.options.issuerId,
+                'exp': NOW + expriresIn,
+                'aud': 'appstoreconnect-v1'
             };
 
-            const SIGN_OPTS = {
-                "algorithm": "ES256",
-                header: {
-                    "alg": "ES256",
-                    "kid": this.options.apiKey,
-                    "typ": "JWT"
+            const SIGN_OPTS: jwt.SignOptions = {
+                'algorithm': 'ES256',
+                'header': {
+                    'alg': 'ES256',
+                    'kid': this.options.apiKey,
+                    'typ': 'JWT'
                 }
             };
 
@@ -242,19 +255,19 @@ export class Client {
         const TOKEN = this._getBearerToken();
 
         const RESPONSE = await got.get(`https://api.appstoreconnect.apple.com/v1/salesReports`, {
-            encoding: null,
-            headers: {
+            'headers': {
                 'Authorization': 'Bearer ' + TOKEN,
                 'Accept': 'application/a-gzip'
             },
-            query: {
+            'responseType': 'buffer',
+            'searchParams': {
                 'filter[frequency]': frequency,
                 'filter[reportDate]': filterReportDate,
                 'filter[reportType]': 'SALES',
                 'filter[reportSubType]': 'SUMMARY',
                 'filter[vendorNumber]': opts.vendorId,
             },
-            throwHttpErrors: false,
+            'throwHttpErrors': false,
         });
 
         if (200 !== RESPONSE.statusCode) {
@@ -267,12 +280,21 @@ export class Client {
                 }] '${RESPONSE.body}'`);
         }
 
-        //@ts-ignore
-        const ZIPPED_CSV: Buffer = RESPONSE.body;
-
-        return readCSV(
+        const ZIPPED_CSV = RESPONSE.body;
+        const ALL_ROWS = await readCSV<SalesReportRow>(
             await gunzip(ZIPPED_CSV, 'utf8')
         );
+
+        const ROWS: SalesReportRow[] = [];
+        const FILTER: SalesReportRowFilter = isNil(opts.filter) ?
+            () => true : opts.filter;
+        for (const R of ALL_ROWS) {
+            if (await Promise.resolve(FILTER(R))) {
+                ROWS.push(R);
+            }
+        }
+
+        return ROWS;
     }
 
     /**
