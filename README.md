@@ -18,7 +18,7 @@ npm install --save @egodigital/appstore-connect
 
 ```typescript
 import * as fs from 'fs';
-import { Client as AppStoreConnectClient } from '@egodigital/appstore-connect';
+import { Client as AppStoreConnectClient, DownloadSalesReportFrequency } from '@egodigital/appstore-connect';
 
 const PRIVATE_KEY = fs.readFileSync(
     '/path/to/your/p8/file'  // downloaded from https://appstoreconnect.apple.com/access/api
