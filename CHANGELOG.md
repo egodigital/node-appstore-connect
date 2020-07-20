@@ -1,5 +1,9 @@
 # Change Log (@egodigital/appstore-connect)
 
+## 0.5.0
+
+* npm update
+
 ## 0.4.0
 
 * updated the following npm modules:
