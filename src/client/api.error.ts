@@ -15,8 +15,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './build';
-export * from './client';
-export * from './release';
-export * from './sales';
-export * from './testflight';
+export class ApiError extends Error {
+
+    constructor(message, public readonly statusCode: number) {
+        super(message);
+    }
+
+}

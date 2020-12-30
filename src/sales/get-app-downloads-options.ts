@@ -15,8 +15,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './build';
-export * from './client';
-export * from './release';
-export * from './sales';
-export * from './testflight';
+/**
+ * Options for 'Client.getAppDownloads()' method.
+ */
+import {DownloadSalesReportSummaryOptions} from "./download-sales-report-summary-options";
+
+export interface GetAppDownloadsOptions extends DownloadSalesReportSummaryOptions {
+}

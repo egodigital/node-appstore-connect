@@ -15,8 +15,20 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './build';
-export * from './client';
-export * from './release';
-export * from './sales';
-export * from './testflight';
+export interface SubmitForReviewOptions {
+
+    /**
+     * Whether or not to auto create an app store version in case it does not already exist
+     */
+    autoCreateVersion?: boolean;
+
+    /**
+     * Whether or not to update the auto release to true. Scheduling is not currently supported via this sdk
+     */
+    autoreleaseOnApproval?: boolean;
+
+    /**
+     * Auto attach this build Id before submitting for review
+     */
+    autoAttachBuildId?: string;
+}

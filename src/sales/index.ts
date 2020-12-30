@@ -15,8 +15,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './build';
-export * from './client';
-export * from './release';
-export * from './sales';
-export * from './testflight';
+export * from './download-sales-report-frequency';
+export * from './download-sales-report-summary-options';
+export * from './get-app-downloads-app-item';
+export * from './get-app-downloads-options';
+export * from './get-app-downloads-result';
+export * from './sales-report-row';
+export * from './sales-report-row-filter';

@@ -15,8 +15,20 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './build';
-export * from './client';
-export * from './release';
-export * from './sales';
-export * from './testflight';
+export interface CreateVersionOptions {
+    /**
+     * Will auto release once approved. Scheduling is not currently supported via this sdk.
+     */
+    autoRelease?: boolean
+
+    /**
+     * The copyright owner of the application
+     */
+    copyright: string,
+
+    /**
+     * Whether or not to use an Identity for Advertisers
+     * @see https://www.appsflyer.com/mobile-attribution-glossary/idfa/
+     */
+    usesIdfa?: boolean
+}

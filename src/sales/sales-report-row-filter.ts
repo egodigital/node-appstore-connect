@@ -15,8 +15,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './build';
-export * from './client';
-export * from './release';
-export * from './sales';
-export * from './testflight';
+/**
+ * A filter for a 'SalesReportRow' item.
+ *
+ * @param {SalesReportRow} row The current item / row.
+ *
+ * @return {boolean|PromiseLike<boolean>} The result, that indicates if filter criteria matches or not.
+ */
+import {SalesReportRow} from "./sales-report-row";
+
+export type SalesReportRowFilter = (row: SalesReportRow) => boolean | PromiseLike<boolean>;

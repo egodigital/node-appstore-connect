@@ -15,8 +15,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './build';
-export * from './client';
-export * from './release';
-export * from './sales';
-export * from './testflight';
+import {AddBuildToExternalGroupOptions} from "./add-build-to-external-group-options";
+import {PlatformType} from "../client";
+
+export interface TestflightClientInterface {
+    addBuildToExternalGroupByGroupId(appId: number, version: string, platform: PlatformType, buildNumber: number, groupId: string, options?: AddBuildToExternalGroupOptions): Promise<void>;
+    addBuildToExternalGroupByGroupIdAndBuildId(buildId: string, groupId: string): Promise<void>;
+    notifyBetaTestersOfNewBuildByBuildId(buildId: string): Promise<void>;
+}

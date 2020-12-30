@@ -15,8 +15,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './build';
-export * from './client';
-export * from './release';
-export * from './sales';
-export * from './testflight';
+import {BuildProcessingState} from "./build-processing-state";
+
+export class BuildProcessingError extends Error {
+
+    constructor(public readonly processingState: BuildProcessingState, message?: string) {
+        super(message || `Processing failed with state: ${processingState}`);
+    }
+}

@@ -15,8 +15,26 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './build';
-export * from './client';
-export * from './release';
-export * from './sales';
-export * from './testflight';
+import {PrivateKey} from "./private-key";
+
+/**
+ * Options for a 'Client' instance.
+ */
+export interface ClientOptions {
+    /**
+     * The API key.
+     */
+    'apiKey': string;
+    /**
+     * The number in sec, the token will expire. Default: 1200
+     */
+    'expriresIn'?: number;
+    /**
+     * The ID of the issuer.
+     */
+    'issuerId': string;
+    /**
+     * The private key.
+     */
+    'privateKey': PrivateKey;
+}

@@ -1,6 +1,6 @@
 {
   "name": "@egodigital/appstore-connect",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": false,
   "description": "API client for Apple App Store Connect API.",
   "main": "lib/index.js",
@@ -18,6 +18,10 @@
     "client"
   ],
   "author": "e.GO Digital GmbH, Aachen, Germany",
+  "contributors": [
+    "Marcel Kloubert",
+    "Josh Woodcock <josh.woodcock@cryptexlabs.com>"
+  ],
   "license": "LGPL-3.0",
   "bugs": {
     "url": "https://github.com/egodigital/node-appstore-connect/issues"
@@ -25,6 +29,8 @@
   "homepage": "https://github.com/egodigital/node-appstore-connect#readme",
   "devDependencies": {
     "@egodigital/tsconfig": "^1.3.0",
+    "rimraf": "^3.0.2",
+    "ts-node": "^9.1.1",
     "tslint": "^5.20.1",
     "typedoc": "^0.16.11",
     "typescript": "^3.9.7"
@@ -38,9 +44,9 @@
     "moment": "^2.27.0"
   },
   "scripts": {
-    "build": "(rm -r ./lib || true) && tsc && tsc -d",
+    "build": "(rimraf ./lib || true) && tsc && tsc -d",
     "deploy": "npm install && npm run build && npm publish",
-    "doc": "(rm -r ./doc || true) && (typedoc --out ./doc ./src)",
-    "sandbox": "npm run build && node ./lib/sandbox.js"
+    "doc": "(rimraf ./doc || true) && (typedoc --out ./doc ./src)",
+    "sandbox": "ts-node src/sandbox.ts"
   }
 }

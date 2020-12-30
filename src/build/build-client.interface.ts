@@ -15,8 +15,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './build';
-export * from './client';
-export * from './release';
-export * from './sales';
-export * from './testflight';
+import {BuildStatus} from "./build-status";
+import {PlatformType} from "../client";
+import {WaitForBuildProcessingOptions} from "./wait-for-build-processing-options";
+
+export interface BuildClientInterface {
+    getBuildId(appId: number, version: string, platform: PlatformType, buildNumber?: number): Promise<string>;
+    getBuildStatusFromBuildId(buildId: string): Promise<BuildStatus>;
+    getBuildStatus(appId: number, version: string, platform: PlatformType, buildNumber?: number): Promise<BuildStatus>;
+    waitForBuildProcessingToComplete(appId: number, platform: PlatformType, version: string, buildNumber: number, options?: WaitForBuildProcessingOptions): Promise<void>;
+}
