@@ -182,6 +182,7 @@ export class BuildClient implements BuildClientInterface {
         const useOptions: WaitForBuildProcessingOptions = {
             pollIntervalInSeconds: 60,
             maxTries: 60,
+            initialDelayInSeconds: 0,
             onPollCallback: () => {},
             ...opt
         }
@@ -192,6 +193,11 @@ export class BuildClient implements BuildClientInterface {
             if (waitStates.includes(status.processingState)) {
                 let tries = 0;
                 useOptions.onPollCallback(status.processingState, tries);
+
+                await new Promise((resolve) => {
+                    setTimeout(resolve, useOptions.initialDelayInSeconds * 1000);
+                });
+
                 const intervalId = setInterval(async () => {
 
                     const status = await this.getBuildStatus(appId, version, platform, buildNumber);

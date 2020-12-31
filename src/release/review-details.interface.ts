@@ -15,11 +15,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {BuildProcessingState} from "./build-processing-state";
-
-export interface WaitForBuildProcessingOptions {
-    pollIntervalInSeconds?: number;
-    maxTries?: number;
-    onPollCallback?: (state: BuildProcessingState, tries: number) => void;
-    initialDelayInSeconds?: number;
+export interface ReviewDetailsInterface {
+    contactEmail?: string;
+    contactFirstName?: string;
+    contactLastName?: string;
+    contactPhone?: string;
+    demoAccountName?: string;
+    demoAccountPassword?: string;
+    demoAccountRequired?: string;
+    notes?: string;
 }

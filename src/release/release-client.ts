@@ -23,6 +23,10 @@ import got from "got";
 import {API_HOST} from "../constants";
 import {CreateVersionOptions} from "./create-version-options";
 import {EnsureVersionOptions} from "./ensure-version-options";
+import {LocalizationInterface} from "./localization.interface";
+import {LocalizationAttributesInterface} from "./localization-attributes.interface";
+import {ReleaseNotesInterface} from "./release-notes.interface";
+import {ReviewDetailsInterface} from "./review-details.interface";
 
 export class ReleaseClient implements ReleaseClientInterface {
 
@@ -87,6 +91,31 @@ export class ReleaseClient implements ReleaseClientInterface {
         }
     }
 
+    private async _updateVersionReleaseType(versionId: string, autoRelease: boolean): Promise<void>{
+        const patchResponse = await got.patch(`${API_HOST}/v1/appStoreVersions/${versionId}`, {
+            'headers':         {
+                'Authorization': `Bearer ${this.tokenProvider.getBearerToken()}`,
+                'Accept':        'application/json'
+            },
+            'responseType':    'json',
+            'json':            {
+                "data": {
+                    "id":         versionId,
+                    "type":       "appStoreVersions",
+                    "attributes": {
+                        "releaseType": autoRelease ? "AFTER_APPROVAL" : "MANUAL"
+                    },
+                }
+            },
+            'throwHttpErrors': false,
+        });
+
+        if (patchResponse.statusCode >= 400) {
+            const errors = (patchResponse.body as any).errors.map(error => error.detail);
+            throw new Error(`Error when trying to update release type for versionId: ${versionId}. Status code: ${patchResponse.statusCode}. Errors: ${errors}`)
+        }
+    }
+
     private async _updateVersionCode(appId: number, version: string, platform: PlatformType) {
 
         const statusesThatCanBeUpdated = [
@@ -128,7 +157,7 @@ export class ReleaseClient implements ReleaseClientInterface {
             throw new Error(`Version could not found for app ${appId}, platform: ${platform} when trying to update version to ${version}`)
         }
 
-        const appStoreVersion = data[0];
+        const appStoreVersion   = data[0];
         const appStoreVersionId = appStoreVersion.id;
 
         const patchResponse = await got.patch(`${API_HOST}/v1/appStoreVersions/${appStoreVersionId}`, {
@@ -137,11 +166,11 @@ export class ReleaseClient implements ReleaseClientInterface {
                 'Accept':        'application/json'
             },
             'responseType':    'json',
-            'json': {
+            'json':            {
                 "data": {
-                    "id": appStoreVersionId,
-                    "type":          "appStoreVersions",
-                    "attributes":    {
+                    "id":         appStoreVersionId,
+                    "type":       "appStoreVersions",
+                    "attributes": {
                         "versionString": version,
                     },
                 }
@@ -231,9 +260,9 @@ export class ReleaseClient implements ReleaseClientInterface {
                 'Accept':        'application/json'
             },
             'responseType':    'json',
-            'json': {
+            'json':            {
                 "data": {
-                    "id": buildId,
+                    "id":   buildId,
                     "type": "builds",
                 }
             },
@@ -260,9 +289,9 @@ export class ReleaseClient implements ReleaseClientInterface {
                 'Accept':        'application/json'
             },
             'responseType':    'json',
-            'json': {
+            'json':            {
                 "data": {
-                    "id": buildId,
+                    "id":   buildId,
                     "type": "builds",
                 }
             },
@@ -285,9 +314,25 @@ export class ReleaseClient implements ReleaseClientInterface {
      */
     public async submitForReview(appId: number, version: string, platform: PlatformType, options?: SubmitForReviewOptions): Promise<void> {
 
+        const opts = options || {};
+        const useOptions: SubmitForReviewOptions = {
+            autoCreateVersion: false,
+            autoreleaseOnApproval: false,
+            ...opts
+        }
+
+        if(useOptions.autoCreateVersion){
+            await this.ensureVersionExists(appId, version, platform, {
+                updateVersionStringIfUnreleasedVersionExists: false,
+                createOptions: {
+                    autoRelease: useOptions.autoreleaseOnApproval
+                }
+            } as EnsureVersionOptions);
+        }
+
         const versionId = await this.getVersionId(appId, version, platform);
 
-        return this.submitForReviewByVersionId(versionId);
+        return this.submitForReviewByVersionId(versionId, options);
     }
 
     /**
@@ -298,6 +343,7 @@ export class ReleaseClient implements ReleaseClientInterface {
      * @param {PlatformType} platform
      */
     public async getVersionId(appId: number, version: string, platform: PlatformType): Promise<string> {
+
         const response = await got.get(`${API_HOST}/v1/apps/${appId}/appStoreVersions`, {
             'headers':         {
                 'Authorization': `Bearer ${this.tokenProvider.getBearerToken()}`,
@@ -339,23 +385,48 @@ export class ReleaseClient implements ReleaseClientInterface {
      */
     public async submitForReviewByVersionId(versionId: string, options?: SubmitForReviewOptions): Promise<void> {
 
+        const opts = options || {};
+        const useOptions: SubmitForReviewOptions = {
+            ...opts
+        }
+
+        if(!useOptions.autoCreateVersion && Object.keys(useOptions).includes('autoreleaseOnApproval')) {
+            await this._updateVersionReleaseType(versionId, useOptions.autoreleaseOnApproval);
+        }
+
+        if(useOptions.autoAttachBuildId){
+            await this.attachBuildIdToVersionByVersionId(versionId, useOptions.autoAttachBuildId);
+        }
+
+        if(useOptions.localizations){
+            await this.setVersionLocalizationsByVersionId(versionId, useOptions.localizations);
+        }
+
+        if(useOptions.releaseNotes){
+           await this._setReleaseNotesByVersionId(versionId, useOptions.releaseNotes);
+        }
+
+        if(useOptions.reviewDetailAttributes){
+            await this.setVersionReviewDetailAttributesByVersionId(versionId, useOptions.reviewDetailAttributes);
+        }
+
         const response = await got.post(`${API_HOST}/v1/appStoreVersionSubmissions`, {
             'headers':         {
                 'Authorization': `Bearer ${this.tokenProvider.getBearerToken()}`,
                 'Accept':        'application/json'
             },
             'responseType':    'json',
-            'json': {
+            'json':            {
                 "data": {
                     "relationships": {
                         "appStoreVersion": {
                             "data": {
-                                "id": versionId,
+                                "id":   versionId,
                                 "type": "appStoreVersions"
                             }
                         }
                     },
-                    "type": "appStoreVersionSubmissions",
+                    "type":          "appStoreVersionSubmissions",
                 }
             },
             'throwHttpErrors': false,
@@ -363,7 +434,233 @@ export class ReleaseClient implements ReleaseClientInterface {
 
         if (response.statusCode >= 400) {
             const errors = (response.body as any).errors.map(error => error.detail);
-            throw new Error(`Error submit app for approval for version id: ${versionId}. Status code: ${response.statusCode}. Errors: ${errors}`)
+            throw new Error(`Error submitting app for approval for version id: ${versionId}. Status code: ${response.statusCode}. Errors: ${errors}`)
         }
     }
+
+    private async _setReleaseNotesByVersionId(versionId: string, releaseNotes: string | ReleaseNotesInterface | ReleaseNotesInterface[]) {
+        if(typeof releaseNotes === "string"){
+            const localization: LocalizationInterface = {
+                lang: 'en-US',
+                attributes: {
+                    whatsNew: releaseNotes
+                }
+            }
+            await this.setVersionLocalizationsByVersionId(versionId, [localization]);
+        }else if(Array.isArray(releaseNotes)){
+            const localizations: LocalizationInterface[] = releaseNotes.map(releaseNote => ({
+                lang: releaseNote.lang,
+                attributes: {
+                    whatsNew: releaseNote.text
+                }
+            }));
+            await this.setVersionLocalizationsByVersionId(versionId, localizations);
+        }else{
+            const localization: LocalizationInterface = {
+                lang: releaseNotes.lang,
+                attributes: {
+                    whatsNew: releaseNotes.text
+                }
+            }
+            await this.setVersionLocalizationsByVersionId(versionId, [localization]);
+        }
+    }
+
+    public async setVersionLocalizationsByVersionId(versionId: string, localizations: LocalizationInterface[]): Promise<void> {
+
+        const response = await got.get(`${API_HOST}/v1/appStoreVersions/${versionId}/appStoreVersionLocalizations`, {
+            'headers':         {
+                'Authorization': `Bearer ${this.tokenProvider.getBearerToken()}`,
+                'Accept':        'application/json'
+            },
+            'searchParams':    {
+                'fields[appStoreVersionLocalizations]': 'locale',
+            },
+            'responseType':    'json',
+            'throwHttpErrors': false,
+        });
+
+        if (response.statusCode >= 400) {
+            const errors = (response.body as any).errors.map(error => error.detail);
+            throw new Error(`Error getting localizations for for version id: ${versionId}. Status code: ${response.statusCode}. Errors: ${errors}`)
+        }
+
+        const data = (response.body as any).data;
+
+        const needLocales = localizations.map(localization => localization.lang);
+        const hasLocales = [];
+        for(const localization of data) {
+            const locale = localization.attributes.locale;
+            hasLocales.push(locale);
+        }
+
+        const missingLocales = needLocales.filter(locale => !hasLocales.includes(locale));
+
+        const missingLocalizations = localizations.filter(localization => missingLocales.includes(localization.lang));
+
+        let promises = [];
+        for(const missingLocalization of missingLocalizations){
+            promises.push(this._createVersionLocalization(versionId, missingLocalization));
+        }
+
+        await Promise.all(promises);
+
+        const nonMissingLocalizations = localizations.filter(localization => !missingLocales.includes(localization.lang));
+        const nonMissingLocalizationData = data
+            .filter(datum => !missingLocales.includes(datum.attributes.locale))
+            .map(datum => ({locale: datum.attributes.locale, id: datum.id }));
+
+        const nonMissingLocalizationIdMap = {};
+        for(const datum of nonMissingLocalizationData) {
+            nonMissingLocalizationIdMap[datum.locale] = datum.id;
+        }
+
+        promises = [];
+        for(const notMissingLocalization of nonMissingLocalizations){
+            promises.push(this._updateVersionLocalization(nonMissingLocalizationIdMap[notMissingLocalization.lang], notMissingLocalization));
+        }
+        await Promise.all(promises);
+    }
+
+    private async _createVersionLocalization(versionId: string, localization: LocalizationInterface): Promise<void> {
+        const defaultAttributes: LocalizationAttributesInterface = {
+            description: '',
+            keywords: '',
+            supportUrl: '',
+        };
+        const response = await got.post(`${API_HOST}/v1/appStoreVersionLocalizations`, {
+            'headers':         {
+                'Authorization': `Bearer ${this.tokenProvider.getBearerToken()}`,
+                'Accept':        'application/json'
+            },
+            'json': {
+                data: {
+                    type: 'appStoreVersionLocalizations',
+                    relationships: {
+                        appStoreVersion: {
+                            data: {
+                                id: versionId,
+                                type: 'appStoreVersions'
+                            }
+                        }
+                    },
+                    attributes: {...defaultAttributes, ...localization.attributes, locale: localization.lang }
+                },
+            },
+            'responseType':    'json',
+            'throwHttpErrors': false,
+        });
+
+        if (response.statusCode >= 400) {
+            const errors = (response.body as any).errors.map(error => error.detail);
+            throw new Error(`Error creating localization version id: ${versionId}, locale: ${localization.lang}. Status code: ${response.statusCode}. Errors: ${errors}`);
+        }
+    }
+
+    private async _updateVersionLocalization(localizationId: string, localization: LocalizationInterface): Promise<void> {
+
+        const response = await got.patch(`${API_HOST}/v1/appStoreVersionLocalizations/${localizationId}`, {
+            'headers':         {
+                'Authorization': `Bearer ${this.tokenProvider.getBearerToken()}`,
+                'Accept':        'application/json'
+            },
+            'json': {
+                data: {
+                    id: localizationId,
+                    type: 'appStoreVersionLocalizations',
+                    attributes: localization.attributes
+                },
+            },
+            'responseType':    'json',
+            'throwHttpErrors': false,
+        });
+
+        if (response.statusCode >= 400) {
+            const errors = (response.body as any).errors.map(error => error.detail);
+            throw new Error(`Error updating localization for locale: ${localization.lang}. Status code: ${response.statusCode}. Errors: ${errors}`);
+        }
+    }
+
+    /**
+     * Sets version review details
+     *
+     * @param {string} versionId
+     * @param {ReviewDetailsInterface?} reviewDetails
+     */
+    public async setVersionReviewDetailAttributesByVersionId(versionId: string, reviewDetails: ReviewDetailsInterface): Promise<void> {
+
+        const appStoreVersionResponse = await got.get(`${API_HOST}/v1/appStoreVersions/${versionId}/relationships/appStoreReviewDetail`, {
+            'headers':         {
+                'Authorization': `Bearer ${this.tokenProvider.getBearerToken()}`,
+                'Accept':        'application/json'
+            },
+            'responseType':    'json',
+            'throwHttpErrors': false,
+        });
+
+        if(appStoreVersionResponse.statusCode === 404){
+            await this._createVersionReviewDetail(versionId, reviewDetails);
+        }else if (appStoreVersionResponse.statusCode >= 400) {
+            const errors = (appStoreVersionResponse.body as any).errors.map(error => error.detail);
+            throw new Error(`Error getting version with id: ${versionId}. Status code: ${appStoreVersionResponse.statusCode}. Errors: ${errors}`);
+        }
+
+        const reviewDetailsId = (appStoreVersionResponse.body as any).data.id;
+
+        await this._updateVersionReviewDetail(reviewDetailsId, reviewDetails);
+    }
+
+    public async _createVersionReviewDetail(versionId: string, reviewDetails: ReviewDetailsInterface): Promise<void>{
+        const response = await got.post(`${API_HOST}/v1/appStoreReviewDetails`, {
+            'headers':         {
+                'Authorization': `Bearer ${this.tokenProvider.getBearerToken()}`,
+                'Accept':        'application/json'
+            },
+            'json': {
+                data: {
+                    attributes: reviewDetails,
+                    relationships: {
+                        appStoreVersion: {
+                            data: {
+                                id: versionId,
+                                type: 'appStoreVersions'
+                            }
+                        }
+                    },
+                    type: 'appStoreReviewDetails'
+                },
+            },
+            'responseType':    'json',
+            'throwHttpErrors': false,
+        });
+
+        if (response.statusCode >= 400) {
+            const errors = (response.body as any).errors.map(error => error.detail);
+            throw new Error(`Error creating version review details: ${versionId}. Status code: ${response.statusCode}. Errors: ${errors}`);
+        }
+    }
+
+    public async _updateVersionReviewDetail(reviewDetailsId: string, reviewDetails: ReviewDetailsInterface): Promise<void>{
+        const response = await got.patch(`${API_HOST}/v1/appStoreReviewDetails/${reviewDetailsId}`, {
+            'headers':         {
+                'Authorization': `Bearer ${this.tokenProvider.getBearerToken()}`,
+                'Accept':        'application/json'
+            },
+            'json': {
+                data: {
+                    attributes: reviewDetails,
+                    id: reviewDetailsId,
+                    type: 'appStoreReviewDetails'
+                },
+            },
+            'responseType':    'json',
+            'throwHttpErrors': false,
+        });
+
+        if (response.statusCode >= 400) {
+            const errors = (response.body as any).errors.map(error => error.detail);
+            throw new Error(`Error updating version review details with id: ${reviewDetailsId}. Status code: ${response.statusCode}. Errors: ${errors}`);
+        }
+    }
+
 }

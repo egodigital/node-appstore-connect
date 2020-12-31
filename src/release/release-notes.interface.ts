@@ -15,11 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {BuildProcessingState} from "./build-processing-state";
-
-export interface WaitForBuildProcessingOptions {
-    pollIntervalInSeconds?: number;
-    maxTries?: number;
-    onPollCallback?: (state: BuildProcessingState, tries: number) => void;
-    initialDelayInSeconds?: number;
+export interface ReleaseNotesInterface {
+    lang: string;
+    text: string;
 }

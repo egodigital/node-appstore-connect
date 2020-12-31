@@ -15,10 +15,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {ReviewDetailsInterface} from "./review-details.interface";
+import {ReleaseNotesInterface} from "./release-notes.interface";
+import {LocalizationInterface} from "./localization.interface";
+
 export interface SubmitForReviewOptions {
 
     /**
      * Whether or not to auto create an app store version in case it does not already exist
+     * This option will also cause any un-released version to be overwritten
      */
     autoCreateVersion?: boolean;
 
@@ -31,4 +36,16 @@ export interface SubmitForReviewOptions {
      * Auto attach this build Id before submitting for review
      */
     autoAttachBuildId?: string;
+
+    /**
+     * If used will override localization attribute. Defaults to en-US for string value.
+     */
+    releaseNotes?: string | ReleaseNotesInterface | ReleaseNotesInterface[];
+
+    /**
+     * Review details for the version
+     */
+    reviewDetailAttributes?: ReviewDetailsInterface;
+
+    localizations?: LocalizationInterface[];
 }

@@ -23,7 +23,14 @@ import {BuildClient} from "../build/build-client";
 import {ReleaseClient} from "../release/release-client";
 import {TestflightClient} from "../testflight/testflight-client";
 import {BuildClientInterface} from "../build/build-client.interface";
-import {CreateVersionOptions, EnsureVersionOptions, PlatformType, SubmitForReviewOptions} from "../release";
+import {
+    CreateVersionOptions,
+    EnsureVersionOptions,
+    PlatformType,
+    SubmitForReviewOptions,
+    LocalizationInterface,
+    ReviewDetailsInterface
+} from "../release";
 import {WaitForBuildProcessingOptions} from "../build";
 import {ReleaseClientInterface} from "../release/release-client.interface";
 import {AddBuildToExternalGroupOptions} from "../testflight";
@@ -238,5 +245,25 @@ export class Client implements BuildClientInterface, ReleaseClientInterface, Tes
      */
     public notifyBetaTestersOfNewBuildByBuildId(buildId: string): Promise<void> {
         return this.testflightClient.notifyBetaTestersOfNewBuildByBuildId(buildId);
+    }
+
+    /**
+     * Creates or updates localizations by version id
+     *
+     * @param {string} versionId
+     * @param {LocalizationInterface[]} localizations
+     */
+    public setVersionLocalizationsByVersionId(versionId: string, localizations: LocalizationInterface[]): Promise<void> {
+        return this.releaseClient.setVersionLocalizationsByVersionId(versionId, localizations);
+    }
+
+    /**
+     * Sets version review details
+     *
+     * @param {string} versionId
+     * @param {ReviewDetailsInterface?} reviewDetails
+     */
+    public setVersionReviewDetailAttributesByVersionId(versionId: string, reviewDetails: ReviewDetailsInterface): Promise<void> {
+        return this.releaseClient.setVersionReviewDetailAttributesByVersionId(versionId, reviewDetails);
     }
 }

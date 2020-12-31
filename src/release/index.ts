@@ -19,3 +19,6 @@ export * from '../client/platform-type';
 export * from './submit-for-review-options';
 export * from './create-version-options';
 export * from './ensure-version-options';
+export * from './review-details.interface';
+export * from './localization.interface';
+export * from './localization-attributes.interface';

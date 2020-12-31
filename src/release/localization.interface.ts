@@ -15,11 +15,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {BuildProcessingState} from "./build-processing-state";
+import {LocalizationAttributesInterface} from "./localization-attributes.interface";
 
-export interface WaitForBuildProcessingOptions {
-    pollIntervalInSeconds?: number;
-    maxTries?: number;
-    onPollCallback?: (state: BuildProcessingState, tries: number) => void;
-    initialDelayInSeconds?: number;
+export interface LocalizationInterface {
+    lang: string;
+    attributes: LocalizationAttributesInterface;
 }
