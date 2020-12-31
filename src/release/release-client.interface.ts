@@ -21,10 +21,12 @@ import {CreateVersionOptions} from "./create-version-options";
 import {EnsureVersionOptions} from "./ensure-version-options";
 import {LocalizationInterface} from "./localization.interface";
 import {ReviewDetailsInterface} from "./review-details.interface";
+import {VersionUpdateOptions} from "./version-update-options";
 
 export interface ReleaseClientInterface {
     ensureVersionExists(appId: number, version: string, platform: PlatformType, options?: EnsureVersionOptions): Promise<void>;
     createVersion(appId: number, version: string, platform: PlatformType, options?: CreateVersionOptions): Promise<void>;
+    updateVersionByVersionId(versionId: string, attributes: VersionUpdateOptions): Promise<void>
     attachBuildIdToVersion(appId: number, version: string, platform: PlatformType, buildId: string): Promise<void>;
     attachBuildIdToVersionByVersionId(versionId: string, buildId: string): Promise<void>;
     submitForReview(appId: number, version: string, platform: PlatformType, options?: SubmitForReviewOptions): Promise<void>;

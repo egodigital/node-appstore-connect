@@ -16,8 +16,9 @@
  */
 
 export interface CreateVersionOptions {
+
     /**
-     * Will auto release once approved. Scheduling is not currently supported via this sdk.
+     * Will auto release once approved
      */
     autoRelease?: boolean
 

@@ -313,7 +313,7 @@ run().then().catch((e: Error) => {
 
 ```typescript
 import * as fs from 'fs';
-import {Client, ClientOptions, PlatformType, SubmitForReviewOptions} from '@egodigital/appstore-connect';
+import {Client, ClientOptions, PlatformType, SubmitForReviewOptions, ReleaseType} from '@egodigital/appstore-connect';
 
 const privateKey = fs.readFileSync(
     '/path/to/your/p8/file'  // downloaded from https://appstoreconnect.apple.com/access/api
@@ -332,33 +332,41 @@ const run = async () => {
     const version = "1.0.25";
 
     const options: SubmitForReviewOptions = {
-        autoCreateVersion: true,
-        autoreleaseOnApproval: true,
-        autoAttachBuildId: "7935ef82-4acf-11eb-b378-0242ac130002",
-        releaseNotes: {
+        autoCreateVersion:      true,
+        autoreleaseOnApproval:  true,
+        autoAttachBuildId:      "7935ef82-4acf-11eb-b378-0242ac130002",
+        releaseNotes:           {
             lang: 'en-CA',
             text: 'Awesome new features. P.S. We love Canada!'
         },
         reviewDetailAttributes: {
-            contactEmail: 'imaspy@gmail.com',
-            contactFirstName: 'Jason Bourne',
-            contactLastName: 'Bourne',
-            contactPhone: '786-255-5555',
-            demoAccountName: 'mrusername',
+            contactEmail:        'imaspy@gmail.com',
+            contactFirstName:    'Jason Bourne',
+            contactLastName:     'Bourne',
+            contactPhone:        '786-255-5555',
+            demoAccountName:     'mrusername',
             demoAccountPassword: 'hello world',
             demoAccountRequired: true,
-            notes: 'Shake the screen to start the demo mode'
+            notes:               'Shake the screen to start the demo mode'
         },
-        localizations: [
+        versionAttributes:      {
+            copyright:           'Spy Corp',
+            earliestReleaseDate: '2020-12-31T17:35:28.603Z',
+            releaseType:         ReleaseType.SCHEDULED,
+            usesIdfa:            false,
+            versionString:       version,
+            downloadable:        true
+        },
+        localizations:          [
             {
-                lang: 'en-US',
+                lang:       'en-US',
                 attributes: {
-                    description: 'The best app of all time',
-                    keywords: 'best,app,ever',
-                    marketingUrl: 'https://spygear.com/app',
+                    description:     'The best app of all time',
+                    keywords:        'best,app,ever',
+                    marketingUrl:    'https://spygear.com/app',
                     promotionalText: 'Spy on anyone with one simple app',
-                    supportUrl: 'https://spygear.com/support',
-                    whatsNew: 'Awesome new features for US users'
+                    supportUrl:      'https://spygear.com/support',
+                    whatsNew:        'Awesome new features for US users'
                 }
             }
         ]

@@ -27,6 +27,7 @@ import {LocalizationInterface} from "./localization.interface";
 import {LocalizationAttributesInterface} from "./localization-attributes.interface";
 import {ReleaseNotesInterface} from "./release-notes.interface";
 import {ReviewDetailsInterface} from "./review-details.interface";
+import {VersionUpdateOptions} from "./version-update-options";
 
 export class ReleaseClient implements ReleaseClientInterface {
 
@@ -410,6 +411,10 @@ export class ReleaseClient implements ReleaseClientInterface {
             await this.setVersionReviewDetailAttributesByVersionId(versionId, useOptions.reviewDetailAttributes);
         }
 
+        if(useOptions.versionAttributes){
+            await this.updateVersionByVersionId(versionId, useOptions.versionAttributes);
+        }
+
         const response = await got.post(`${API_HOST}/v1/appStoreVersionSubmissions`, {
             'headers':         {
                 'Authorization': `Bearer ${this.tokenProvider.getBearerToken()}`,
@@ -466,6 +471,12 @@ export class ReleaseClient implements ReleaseClientInterface {
         }
     }
 
+    /**
+     * Creates or updates version localizations
+     *
+     * @param {string} versionId
+     * @param {LocalizationInterface[]} localizations
+     */
     public async setVersionLocalizationsByVersionId(versionId: string, localizations: LocalizationInterface[]): Promise<void> {
 
         const response = await got.get(`${API_HOST}/v1/appStoreVersions/${versionId}/appStoreVersionLocalizations`, {
@@ -660,6 +671,35 @@ export class ReleaseClient implements ReleaseClientInterface {
         if (response.statusCode >= 400) {
             const errors = (response.body as any).errors.map(error => error.detail);
             throw new Error(`Error updating version review details with id: ${reviewDetailsId}. Status code: ${response.statusCode}. Errors: ${errors}`);
+        }
+    }
+
+    /**
+     * Updates a version
+     *
+     * @param {string} versionId
+     * @param {VersionUpdateOptions} attributes
+     */
+    public async updateVersionByVersionId(versionId: string, attributes: VersionUpdateOptions): Promise<void> {
+        const response = await got.patch(`${API_HOST}/v1/appStoreVersions/${versionId}`, {
+            'headers':         {
+                'Authorization': `Bearer ${this.tokenProvider.getBearerToken()}`,
+                'Accept':        'application/json'
+            },
+            'json': {
+                data: {
+                    attributes: attributes,
+                    id: versionId,
+                    type: 'appStoreVersions'
+                },
+            },
+            'responseType':    'json',
+            'throwHttpErrors': false,
+        });
+
+        if (response.statusCode >= 400) {
+            const errors = (response.body as any).errors.map(error => error.detail);
+            throw new Error(`Error updating version with id: ${versionId}. Status code: ${response.statusCode}. Errors: ${errors}`);
         }
     }
 

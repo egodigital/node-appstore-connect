@@ -35,12 +35,18 @@ import {WaitForBuildProcessingOptions} from "../build";
 import {ReleaseClientInterface} from "../release/release-client.interface";
 import {AddBuildToExternalGroupOptions} from "../testflight";
 import {TestflightClientInterface} from "../testflight/testflight-client.interface";
+import {VersionUpdateOptions} from "../release/version-update-options";
 
 /**
  * A client for the App Store Connect API.
  */
 export class Client implements BuildClientInterface, ReleaseClientInterface, TestflightClientInterface {
 
+    /**
+     * Creates an instance of a client to make requests to app store connect API
+     *
+     * @param {ClientOptions} clientOptions
+     */
     public static create(clientOptions: ClientOptions) {
         const tokenProvider    = new TokenProvider(clientOptions);
         const salesClient      = new SalesClient(tokenProvider);
@@ -265,5 +271,15 @@ export class Client implements BuildClientInterface, ReleaseClientInterface, Tes
      */
     public setVersionReviewDetailAttributesByVersionId(versionId: string, reviewDetails: ReviewDetailsInterface): Promise<void> {
         return this.releaseClient.setVersionReviewDetailAttributesByVersionId(versionId, reviewDetails);
+    }
+
+    /**
+     * Updates a version
+     *
+     * @param {string} versionId
+     * @param {VersionUpdateOptions} attributes
+     */
+    public updateVersionByVersionId(versionId: string, attributes: VersionUpdateOptions): Promise<void> {
+        return this.releaseClient.updateVersionByVersionId(versionId, attributes)
     }
 }
