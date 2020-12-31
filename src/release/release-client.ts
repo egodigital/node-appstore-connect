@@ -438,7 +438,7 @@ export class ReleaseClient implements ReleaseClientInterface {
         });
 
         if (response.statusCode >= 400) {
-            const errors = (response.body as any).errors.map(error => error.detail);
+            const errors = JSON.stringify(response.body as any)
             throw new Error(`Error submitting app for approval for version id: ${versionId}. Status code: ${response.statusCode}. Errors: ${errors}`)
         }
     }
