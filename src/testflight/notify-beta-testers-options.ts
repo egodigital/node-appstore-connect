@@ -15,11 +15,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './submit-for-review-options';
-export * from './create-version-options';
-export * from './ensure-version-options';
-export * from './review-details.interface';
-export * from './localization.interface';
-export * from './localization-attributes.interface';
-export * from './version-update-options';
-export * from './release-notes.interface';
+export interface NotifyBetaTestersOptions {
+
+    /**
+     * Ignores errors if notification is already enabled
+     *
+     * @default {false}
+     */
+    ignoreIfEnabled?: boolean
+}

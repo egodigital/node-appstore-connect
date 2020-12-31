@@ -16,3 +16,4 @@
  */
 
 export * from './add-build-to-external-group-options';
+export * from './notify-beta-testers-options';

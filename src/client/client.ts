@@ -26,16 +26,16 @@ import {BuildClientInterface} from "../build/build-client.interface";
 import {
     CreateVersionOptions,
     EnsureVersionOptions,
-    PlatformType,
-    SubmitForReviewOptions,
     LocalizationInterface,
-    ReviewDetailsInterface
+    ReviewDetailsInterface,
+    SubmitForReviewOptions
 } from "../release";
 import {WaitForBuildProcessingOptions} from "../build";
 import {ReleaseClientInterface} from "../release/release-client.interface";
-import {AddBuildToExternalGroupOptions} from "../testflight";
+import {AddBuildToExternalGroupOptions, NotifyBetaTestersOptions} from "../testflight";
 import {TestflightClientInterface} from "../testflight/testflight-client.interface";
-import {VersionUpdateOptions} from "../release/version-update-options";
+import {VersionUpdateOptions} from "../release";
+import {PlatformType} from "./platform-type";
 
 /**
  * A client for the App Store Connect API.
@@ -248,9 +248,10 @@ export class Client implements BuildClientInterface, ReleaseClientInterface, Tes
      * Notifies beta testers there is a new build
      *
      * @param {string} buildId
+     * @param {NotifyBetaTestersOptions?} options
      */
-    public notifyBetaTestersOfNewBuildByBuildId(buildId: string): Promise<void> {
-        return this.testflightClient.notifyBetaTestersOfNewBuildByBuildId(buildId);
+    public notifyBetaTestersOfNewBuildByBuildId(buildId: string, options?: NotifyBetaTestersOptions): Promise<void> {
+        return this.testflightClient.notifyBetaTestersOfNewBuildByBuildId(buildId, options);
     }
 
     /**

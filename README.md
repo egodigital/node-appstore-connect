@@ -341,7 +341,7 @@ const run = async () => {
         },
         reviewDetailAttributes: {
             contactEmail:        'imaspy@gmail.com',
-            contactFirstName:    'Jason Bourne',
+            contactFirstName:    'Jason',
             contactLastName:     'Bourne',
             contactPhone:        '786-255-5555',
             demoAccountName:     'mrusername',

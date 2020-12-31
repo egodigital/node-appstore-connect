@@ -33,5 +33,5 @@ export interface ReleaseClientInterface {
     submitForReviewByVersionId(versionId: string, options?: SubmitForReviewOptions): Promise<void>
     getVersionId(appId: number, version: string, platform: PlatformType): Promise<string>;
     setVersionLocalizationsByVersionId(versionId: string, localizations: LocalizationInterface[]): Promise<void>;
-    setVersionReviewDetailAttributesByVersionId(versionId: string, reviewDetails: ReviewDetailsInterface): Promise<void>
+    setVersionReviewDetailAttributesByVersionId(versionId: string, reviewDetails: ReviewDetailsInterface): Promise<void>;
 }

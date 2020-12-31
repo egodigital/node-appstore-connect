@@ -22,6 +22,7 @@ import got from "got";
 import {API_HOST} from "../constants";
 import {PlatformType} from "../client";
 import {BuildClient} from "../build/build-client";
+import {NotifyBetaTestersOptions} from "./notify-beta-testers-options";
 
 export class TestflightClient implements TestflightClientInterface {
 
@@ -87,7 +88,7 @@ export class TestflightClient implements TestflightClientInterface {
         }
 
         if(useOptions.notifyBetaTestersThereIsANewBuild){
-            await this.notifyBetaTestersOfNewBuildByBuildId(buildId);
+            await this.notifyBetaTestersOfNewBuildByBuildId(buildId, useOptions.notifyOptions);
         }
     }
 
@@ -95,8 +96,16 @@ export class TestflightClient implements TestflightClientInterface {
      * Notifies beta testers there is a new build
      *
      * @param {string} buildId
+     * @param {NotifyBetaTestersOptions?} options
+     *
      */
-    public async notifyBetaTestersOfNewBuildByBuildId(buildId: string): Promise<void> {
+    public async notifyBetaTestersOfNewBuildByBuildId(buildId: string, options?: NotifyBetaTestersOptions): Promise<void> {
+
+        const opts = options || {};
+        const useOptions: NotifyBetaTestersOptions = {
+            ignoreIfEnabled: false,
+            ...opts
+        }
         const notificationResponse = await got.post(`${API_HOST}/v1/buildBetaNotifications`, {
             'headers':         {
                 'Authorization': `Bearer ${this.tokenProvider.getBearerToken()}`,
@@ -118,6 +127,10 @@ export class TestflightClient implements TestflightClientInterface {
             },
             'throwHttpErrors': false,
         });
+
+        if(notificationResponse.statusCode === 409 && useOptions.ignoreIfEnabled){
+            return;
+        }
 
         if (notificationResponse.statusCode >= 400) {
             const errors = (notificationResponse.body as any).errors.map(error => error.detail);
