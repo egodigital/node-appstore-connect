@@ -586,6 +586,15 @@ export class ReleaseClient implements ReleaseClientInterface {
             'throwHttpErrors': false,
         });
 
+        if (response.statusCode >= 409) {
+            const errors = (response.body as any).errors.map(error => error.detail);
+            // This will happen if it's a first time app submission
+            if(errors.includes("Attribute 'whatsNew' cannot be edited at this time") && errors.length === 1) {
+                const noWhatNewLocalization = {...localization, attributes: { ...localization.attributes, whatsNew: undefined } }
+                return this._updateVersionLocalization(localizationId, noWhatNewLocalization);
+            }
+        }
+
         if (response.statusCode >= 400) {
             const errors = (response.body as any).errors.map(error => error.detail);
             throw new Error(`Error updating localization for locale: ${localization.lang}. Status code: ${response.statusCode}. Errors: ${errors}`);
