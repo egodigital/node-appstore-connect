@@ -15,12 +15,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AddBuildToExternalGroupOptions} from "./add-build-to-external-group-options";
+import {TestflightAddBuildToExternalGroupOptions} from "./testflight-add-build-to-external-group-options";
 import {PlatformType} from "../client";
-import {NotifyBetaTestersOptions} from "./notify-beta-testers-options";
+import {TestflightNotifyBetaTestersOptions} from "./testflight-notify-beta-testers-options";
+import {TestflightCreateGroupOptions} from "./testflight-create-group-options";
 
 export interface TestflightClientInterface {
-    addBuildToExternalGroupByGroupId(appId: number, version: string, platform: PlatformType, buildNumber: number, groupId: string, options?: AddBuildToExternalGroupOptions): Promise<void>;
+    addBuildToExternalGroupByGroupId(appId: number, version: string, platform: PlatformType, buildNumber: number, groupId: string, options?: TestflightAddBuildToExternalGroupOptions): Promise<void>;
     addBuildToExternalGroupByGroupIdAndBuildId(buildId: string, groupId: string): Promise<void>;
-    notifyBetaTestersOfNewBuildByBuildId(buildId: string, options?: NotifyBetaTestersOptions): Promise<void>;
+    addBuildToExternalGroupByBuildId(appId: number, buildId: string, groupName: string, options?: TestflightAddBuildToExternalGroupOptions): Promise<void>;
+    notifyBetaTestersOfNewBuildByBuildId(buildId: string, options?: TestflightNotifyBetaTestersOptions): Promise<void>;
+    createExternalBetaTestersGroup(appId: number, groupName: string, options?: TestflightCreateGroupOptions): Promise<string>;
+    getExternalBetaTestersGroupId(appId: number, groupName: string): Promise<string>;
 }

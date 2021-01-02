@@ -32,7 +32,7 @@ import {
 } from "../release";
 import {WaitForBuildProcessingOptions} from "../build";
 import {ReleaseClientInterface} from "../release/release-client.interface";
-import {AddBuildToExternalGroupOptions, NotifyBetaTestersOptions} from "../testflight";
+import {TestflightAddBuildToExternalGroupOptions, TestflightCreateGroupOptions, TestflightNotifyBetaTestersOptions} from "../testflight";
 import {TestflightClientInterface} from "../testflight/testflight-client.interface";
 import {VersionUpdateOptions} from "../release";
 import {PlatformType} from "./platform-type";
@@ -227,9 +227,9 @@ export class Client implements BuildClientInterface, ReleaseClientInterface, Tes
      * @param {PlatformType} platform
      * @param {number} buildNumber
      * @param {string} groupId
-     * @param {AddBuildToExternalGroupOptions?} options
+     * @param {TestflightAddBuildToExternalGroupOptions?} options
      */
-    public addBuildToExternalGroupByGroupId(appId: number, version: string, platform: PlatformType, buildNumber: number, groupId: string, options?: AddBuildToExternalGroupOptions): Promise<void> {
+    public addBuildToExternalGroupByGroupId(appId: number, version: string, platform: PlatformType, buildNumber: number, groupId: string, options?: TestflightAddBuildToExternalGroupOptions): Promise<void> {
         return this.testflightClient.addBuildToExternalGroupByGroupId(appId, version, platform, buildNumber, groupId, options);
     }
 
@@ -238,19 +238,31 @@ export class Client implements BuildClientInterface, ReleaseClientInterface, Tes
      *
      * @param {string} buildId
      * @param {string} groupId
-     * @param {AddBuildToExternalGroupOptions?} options
+     * @param {TestflightAddBuildToExternalGroupOptions?} options
      */
-    public addBuildToExternalGroupByGroupIdAndBuildId(buildId: string, groupId: string, options?: AddBuildToExternalGroupOptions): Promise<void> {
+    public addBuildToExternalGroupByGroupIdAndBuildId(buildId: string, groupId: string, options?: TestflightAddBuildToExternalGroupOptions): Promise<void> {
         return this.testflightClient.addBuildToExternalGroupByGroupIdAndBuildId(buildId, groupId, options);
+    }
+
+    /**
+     * Adds build to group by group name
+     *
+     * @param {number} appId
+     * @param {string} buildId
+     * @param {string} groupName
+     * @param {TestflightAddBuildToExternalGroupOptions?} options
+     */
+    public addBuildToExternalGroupByBuildId(appId: number, buildId: string, groupName: string, options?: TestflightAddBuildToExternalGroupOptions): Promise<void> {
+        return this.testflightClient.addBuildToExternalGroupByBuildId(appId, buildId, groupName, options);
     }
 
     /**
      * Notifies beta testers there is a new build
      *
      * @param {string} buildId
-     * @param {NotifyBetaTestersOptions?} options
+     * @param {TestflightNotifyBetaTestersOptions?} options
      */
-    public notifyBetaTestersOfNewBuildByBuildId(buildId: string, options?: NotifyBetaTestersOptions): Promise<void> {
+    public notifyBetaTestersOfNewBuildByBuildId(buildId: string, options?: TestflightNotifyBetaTestersOptions): Promise<void> {
         return this.testflightClient.notifyBetaTestersOfNewBuildByBuildId(buildId, options);
     }
 
@@ -283,4 +295,31 @@ export class Client implements BuildClientInterface, ReleaseClientInterface, Tes
     public updateVersionByVersionId(versionId: string, attributes: VersionUpdateOptions): Promise<void> {
         return this.releaseClient.updateVersionByVersionId(versionId, attributes)
     }
+
+    /**
+     * Creates an external beta testing group
+     *
+     * @param {number} appId
+     * @param {string} groupName
+     * @param {TestflightCreateGroupOptions?} options
+     *
+     * @returns Promise<string> A promise with the group id
+     */
+    public createExternalBetaTestersGroup(appId: number, groupName: string, options?: TestflightCreateGroupOptions): Promise<string> {
+        return this.testflightClient.createExternalBetaTestersGroup(appId, groupName, options);
+    }
+
+    /**
+     * Gets an external beta testing group ID by app ID and group name
+     *
+     * @param {number} appId
+     * @param {string} groupName
+     *
+     * @returns Promise<string> A promise with the group id
+     */
+    public getExternalBetaTestersGroupId(appId: number, groupName: string): Promise<string> {
+        return this.testflightClient.getExternalBetaTestersGroupId(appId, groupName);
+    }
+
+
 }

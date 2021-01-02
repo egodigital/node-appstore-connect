@@ -17,12 +17,13 @@
 
 import {TokenProvider} from "../client/token-provider";
 import {TestflightClientInterface} from "./testflight-client.interface";
-import {AddBuildToExternalGroupOptions} from "./add-build-to-external-group-options";
+import {TestflightAddBuildToExternalGroupOptions} from "./testflight-add-build-to-external-group-options";
 import got from "got";
 import {API_HOST} from "../constants";
-import {PlatformType} from "../client";
+import {ApiError, PlatformType} from "../client";
 import {BuildClient} from "../build/build-client";
-import {NotifyBetaTestersOptions} from "./notify-beta-testers-options";
+import {TestflightNotifyBetaTestersOptions} from "./testflight-notify-beta-testers-options";
+import {TestflightCreateGroupOptions} from "./testflight-create-group-options";
 
 export class TestflightClient implements TestflightClientInterface {
 
@@ -41,9 +42,9 @@ export class TestflightClient implements TestflightClientInterface {
      * @param {PlatformType} platform
      * @param {number} buildNumber
      * @param {string} groupId
-     * @param {AddBuildToExternalGroupOptions?} options
+     * @param {TestflightAddBuildToExternalGroupOptions?} options
      */
-    public async addBuildToExternalGroupByGroupId(appId: number, version: string, platform: PlatformType, buildNumber: number, groupId: string, options?: AddBuildToExternalGroupOptions): Promise<void> {
+    public async addBuildToExternalGroupByGroupId(appId: number, version: string, platform: PlatformType, buildNumber: number, groupId: string, options?: TestflightAddBuildToExternalGroupOptions): Promise<void> {
 
         const buildId = await this.buildClient.getBuildId(appId, version, platform, buildNumber);
 
@@ -51,16 +52,41 @@ export class TestflightClient implements TestflightClientInterface {
     }
 
     /**
+     * Adds build to group by group name
+     *
+     * @param {number} appId
+     * @param {string} buildId
+     * @param {string} groupName
+     * @param {TestflightAddBuildToExternalGroupOptions?} options
+     */
+    public async addBuildToExternalGroupByBuildId(appId: number, buildId: string, groupName: string, options?: TestflightAddBuildToExternalGroupOptions): Promise<void> {
+        const opts = options || {};
+        const useOptions: TestflightAddBuildToExternalGroupOptions = {
+            createGroupIfNotExists: true,
+            ...opts
+        }
+
+        let groupId;
+        if(useOptions.createGroupIfNotExists) {
+            groupId = await this.createExternalBetaTestersGroup(appId, groupName);
+        }else{
+            groupId = await this.getExternalBetaTestersGroupId(appId, groupName);
+        }
+
+        return this.addBuildToExternalGroupByGroupIdAndBuildId(buildId, groupId, options);
+    }
+
+    /**
      * Adds build to external test flight user group. App must be already approved for beta testing perform this function.
      *
      * @param {string} buildId
      * @param {string} groupId
-     * @param {AddBuildToExternalGroupOptions?} options
+     * @param {TestflightAddBuildToExternalGroupOptions?} options
      */
-    public async addBuildToExternalGroupByGroupIdAndBuildId(buildId: string, groupId: string, options?: AddBuildToExternalGroupOptions): Promise<void> {
+    public async addBuildToExternalGroupByGroupIdAndBuildId(buildId: string, groupId: string, options?: TestflightAddBuildToExternalGroupOptions): Promise<void> {
 
-        const opts = options || {};
-        const useOptions: AddBuildToExternalGroupOptions = {
+        const opts                                                 = options || {};
+        const useOptions: TestflightAddBuildToExternalGroupOptions = {
             notifyBetaTestersThereIsANewBuild: false,
             ...opts
         }
@@ -96,17 +122,17 @@ export class TestflightClient implements TestflightClientInterface {
      * Notifies beta testers there is a new build
      *
      * @param {string} buildId
-     * @param {NotifyBetaTestersOptions?} options
+     * @param {TestflightNotifyBetaTestersOptions?} options
      *
      */
-    public async notifyBetaTestersOfNewBuildByBuildId(buildId: string, options?: NotifyBetaTestersOptions): Promise<void> {
+    public async notifyBetaTestersOfNewBuildByBuildId(buildId: string, options?: TestflightNotifyBetaTestersOptions): Promise<void> {
 
-        const opts = options || {};
-        const useOptions: NotifyBetaTestersOptions = {
+        const opts                                           = options || {};
+        const useOptions: TestflightNotifyBetaTestersOptions = {
             ignoreIfEnabled: false,
             ...opts
         }
-        const notificationResponse = await got.post(`${API_HOST}/v1/buildBetaNotifications`, {
+        const notificationResponse                           = await got.post(`${API_HOST}/v1/buildBetaNotifications`, {
             'headers':         {
                 'Authorization': `Bearer ${this.tokenProvider.getBearerToken()}`,
                 'Accept':        'application/json'
@@ -138,5 +164,106 @@ export class TestflightClient implements TestflightClientInterface {
         }
     }
 
+    /**
+     * Creates an external group
+     *
+     * @param {number} appId
+     * @param {string} groupName
+     * @param {TestflightCreateGroupOptions?} options
+     *
+     * @returns Promise<string> A promise with the group id
+     */
+    public async createExternalBetaTestersGroup(appId: number, groupName: string, options?: TestflightCreateGroupOptions): Promise<string> {
+
+        const opts = options || {};
+        const useOptions: TestflightCreateGroupOptions = {
+            allowDuplicates: false,
+            ...opts
+        }
+
+        if(!useOptions.allowDuplicates){
+            try {
+                return await this.getExternalBetaTestersGroupId(appId, groupName);
+            }catch (e){
+                if(e.statusCode !== 404){
+                    throw e;
+                }
+            }
+        }
+
+        const createGroupResponse = await got.post(`${API_HOST}/v1/betaGroups`, {
+            'headers':         {
+                'Authorization': `Bearer ${this.tokenProvider.getBearerToken()}`,
+                'Accept':        'application/json'
+            },
+            'responseType':    'json',
+            'json': {
+                data: {
+                    attributes: {
+                        name: groupName
+                    },
+                    relationships: {
+                        app: {
+                            data: {
+                                id: appId,
+                                type: "apps"
+                            }
+                        }
+                    },
+                    type: "betaGroups",
+                }
+            },
+            'throwHttpErrors': false,
+        });
+
+        if (createGroupResponse.statusCode >= 400) {
+            const errors = (createGroupResponse.body as any).errors.map(error => error.detail);
+            throw new Error(`Error sending notification for group name: ${groupName}. Status code: ${createGroupResponse.statusCode}. Errors: ${errors}`)
+        }
+
+        const data = (createGroupResponse.body as any).data;
+
+        return data.id;
+    }
+
+    /**
+     * Gets an external beta testing group ID by app ID and group name
+     *
+     * @param {number} appId
+     * @param {string} groupName
+     *
+     * @throws {ApiError | Error}
+     * @returns Promise<string> A promise with the group id
+     */
+    public async getExternalBetaTestersGroupId(appId: number, groupName: string): Promise<string> {
+        const response = await got.get(`${API_HOST}/v1/betaGroups`, {
+            'headers':         {
+                'Authorization': `Bearer ${this.tokenProvider.getBearerToken()}`,
+                'Accept':        'application/json'
+            },
+            'responseType':    'json',
+            'searchParams':    {
+                'fields[apps]': '',
+                'filter[app]': appId,
+                'filter[name]': groupName,
+            },
+            'throwHttpErrors': false,
+        });
+
+        if (response.statusCode >= 400) {
+            throw new Error(`Error fetching build for app ${appId} with group name: ${groupName}. Status code: ${response.statusCode}`)
+        }
+
+        const data = (response.body as any).data;
+
+        if (data.length > 1) {
+            throw new Error(`Received too many results for app ${appId} with group name: ${groupName}`);
+        }
+        if (data.length === 0) {
+            throw new ApiError(`Group not found for app ${appId} with group name: ${groupName}`, 404);
+        }
+
+        return data[0].id;
+    }
 
 }

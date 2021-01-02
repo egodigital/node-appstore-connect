@@ -15,6 +15,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './testflight-add-build-to-external-group-options';
-export * from './testflight-notify-beta-testers-options';
-export * from './testflight-create-group-options';
+export interface TestflightNotifyBetaTestersOptions {
+
+    /**
+     * Ignores errors if notification is already enabled
+     *
+     * @default {false}
+     */
+    ignoreIfEnabled?: boolean
+}

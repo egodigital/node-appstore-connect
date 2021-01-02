@@ -15,12 +15,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export interface NotifyBetaTestersOptions {
+export interface TestflightCreateGroupOptions {
 
     /**
-     * Ignores errors if notification is already enabled
-     *
      * @default {false}
      */
-    ignoreIfEnabled?: boolean
+    allowDuplicates?: boolean
 }
