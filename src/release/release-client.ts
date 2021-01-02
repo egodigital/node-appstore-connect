@@ -322,9 +322,9 @@ export class ReleaseClient implements ReleaseClientInterface {
             ...opts
         }
 
-        if(useOptions.autoCreateVersion){
+        if(useOptions.autoCreateVersion) {
             await this.ensureVersionExists(appId, version, platform, {
-                updateVersionStringIfUnreleasedVersionExists: false,
+                updateVersionStringIfUnreleasedVersionExists: true,
                 createOptions: {
                     autoRelease: useOptions.autoreleaseOnApproval
                 }
