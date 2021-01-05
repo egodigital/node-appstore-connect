@@ -331,7 +331,20 @@ export class ReleaseClient implements ReleaseClientInterface {
             } as EnsureVersionOptions);
         }
 
-        const versionId = await this.getVersionId(appId, version, platform);
+        let versionId;
+        try {
+            versionId = await this.getVersionId(appId, version, platform);
+        } catch (e){
+            const error: ApiError = e;
+            // Try again to get the version
+            if(error.statusCode === 404 && useOptions.autoCreateVersion) {
+                await new Promise((resolve => {
+                    setTimeout(resolve, 10 * 1000);
+                }));
+                versionId = await this.getVersionId(appId, version, platform);
+            }
+        }
+
 
         return this.submitForReviewByVersionId(versionId, options);
     }
@@ -370,7 +383,7 @@ export class ReleaseClient implements ReleaseClientInterface {
             throw new Error(`Received too many results for app ${appId} with version: ${version}, platform: ${platform}`);
         }
         if (data.length === 0) {
-            throw new Error(`Version not found for app ${appId} with version: ${version}, platform: ${platform}`)
+            throw new ApiError(`Version not found for app ${appId} with version: ${version}, platform: ${platform}`, 404);
         }
 
         const appStoreVersion = data[0];
