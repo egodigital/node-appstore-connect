@@ -24,6 +24,7 @@ import {BuildProcessingState} from "./build-processing-state";
 import {BuildProcessingError} from "./build-processing-error";
 import {WaitForBuildProcessingOptions} from "./wait-for-build-processing-options";
 import {PlatformType} from "../client";
+import {BuildUpdateOptions} from "./build-update-options";
 
 export class BuildClient implements BuildClientInterface {
 
@@ -227,5 +228,33 @@ export class BuildClient implements BuildClientInterface {
                 }
             }
         })
+    }
+
+    /**
+     * Updates a build
+     *
+     * @param {string} buildId
+     * @param {BuildUpdateOptions} options
+     */
+    public async updateBuild(buildId: string, options: BuildUpdateOptions): Promise<void> {
+        const response = await got.patch(`${API_HOST}/v1/builds/${buildId}`, {
+            'headers':         {
+                'Authorization': `Bearer ${this.tokenProvider.getBearerToken()}`,
+                'Accept':        'application/json'
+            },
+            'responseType':    'json',
+            'throwHttpErrors': false,
+            json: {
+                data: {
+                    id: buildId,
+                    attributes: options,
+                    type: 'builds'
+                }
+            }
+        });
+
+        if (response.statusCode >= 400) {
+            throw new Error(`Error updating with id ${buildId}. Status code: ${response.statusCode}`)
+        }
     }
 }

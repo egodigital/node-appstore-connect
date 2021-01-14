@@ -15,7 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './build-status';
-export * from './build-processing-state';
-export * from './wait-for-build-processing-options';
-export * from './build-update-options';
+export interface BuildUpdateOptions {
+    expired?: boolean,
+    usesNonExemptEncryption?: boolean,
+}

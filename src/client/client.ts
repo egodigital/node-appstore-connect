@@ -30,7 +30,7 @@ import {
     ReviewDetailsInterface,
     SubmitForReviewOptions
 } from "../release";
-import {WaitForBuildProcessingOptions} from "../build";
+import {BuildUpdateOptions, WaitForBuildProcessingOptions} from "../build";
 import {ReleaseClientInterface} from "../release/release-client.interface";
 import {TestflightAddBuildToExternalGroupOptions, TestflightCreateGroupOptions, TestflightNotifyBetaTestersOptions} from "../testflight";
 import {TestflightClientInterface} from "../testflight/testflight-client.interface";
@@ -321,5 +321,14 @@ export class Client implements BuildClientInterface, ReleaseClientInterface, Tes
         return this.testflightClient.getExternalBetaTestersGroupId(appId, groupName);
     }
 
+    /**
+     * Updates a build
+     *
+     * @param {string} buildId
+     * @param {BuildUpdateOptions} options
+     */
+    public updateBuild(buildId: string, options: BuildUpdateOptions): Promise<void> {
+        return this.buildClient.updateBuild(buildId, options);
+    }
 
 }
