@@ -15,8 +15,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './build-status';
-export * from './build-processing-state';
-export * from './wait-for-build-processing-options';
-export * from './build-update-options';
-export * from './build.interface';
+export interface BuildInterface {
+    expired: boolean,
+    minOsVersion: string,
+    iconAssetToken: {
+        templateUrl: string,
+        height: number,
+        width: number
+    }
+    usesNonExemptEncryption: boolean,
+    uploadedDate: Date,
+    expirationDate: Date
+}

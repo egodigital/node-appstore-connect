@@ -19,6 +19,7 @@ import {BuildStatus} from "./build-status";
 import {PlatformType} from "../client";
 import {WaitForBuildProcessingOptions} from "./wait-for-build-processing-options";
 import {BuildUpdateOptions} from "./build-update-options";
+import {BuildInterface} from "./build.interface";
 
 export interface BuildClientInterface {
     getBuildId(appId: number, version: string, platform: PlatformType, buildNumber?: number): Promise<string>;
@@ -26,4 +27,5 @@ export interface BuildClientInterface {
     getBuildStatus(appId: number, version: string, platform: PlatformType, buildNumber?: number): Promise<BuildStatus>;
     waitForBuildProcessingToComplete(appId: number, platform: PlatformType, version: string, buildNumber: number, options?: WaitForBuildProcessingOptions): Promise<void>;
     updateBuild(buildId: string, options: BuildUpdateOptions): Promise<void>;
+    getBuild(buildId: string): Promise<BuildInterface>;
 }

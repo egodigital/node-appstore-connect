@@ -25,6 +25,7 @@ import {BuildProcessingError} from "./build-processing-error";
 import {WaitForBuildProcessingOptions} from "./wait-for-build-processing-options";
 import {PlatformType} from "../client";
 import {BuildUpdateOptions} from "./build-update-options";
+import {BuildInterface} from "./build.interface";
 
 export class BuildClient implements BuildClientInterface {
 
@@ -179,12 +180,13 @@ export class BuildClient implements BuildClientInterface {
      */
     public waitForBuildProcessingToComplete(appId: number, platform: PlatformType, version: string, buildNumber: number, options?: WaitForBuildProcessingOptions): Promise<void> {
 
-        const opt = options || {};
+        const opt                                       = options || {};
         const useOptions: WaitForBuildProcessingOptions = {
             pollIntervalInSeconds: 60,
-            maxTries: 60,
+            maxTries:              60,
             initialDelayInSeconds: 0,
-            onPollCallback: () => {},
+            onPollCallback:        () => {
+            },
             ...opt
         }
         return new Promise<void>(async (resolve, reject) => {
@@ -204,26 +206,26 @@ export class BuildClient implements BuildClientInterface {
                     const status = await this.getBuildStatus(appId, version, platform, buildNumber);
                     useOptions.onPollCallback(status.processingState, tries);
 
-                    if(failStates.includes(status.processingState)){
+                    if (failStates.includes(status.processingState)) {
                         clearInterval(intervalId);
                         reject(new BuildProcessingError(status.processingState));
                     }
 
-                    if(status.processingState === BuildProcessingState.VALID) {
+                    if (status.processingState === BuildProcessingState.VALID) {
                         clearInterval(intervalId);
                         resolve();
                     }
                     tries++;
-                    if(tries >= useOptions.maxTries){
+                    if (tries >= useOptions.maxTries) {
                         clearInterval(intervalId);
                         reject(new BuildProcessingError(BuildProcessingState.UNKNOWN, `Timed out waiting for processing to complete`));
                     }
 
                 }, 1000 * useOptions.pollIntervalInSeconds)
-            }else{
-                if(failStates.includes(status.processingState)){
+            } else {
+                if (failStates.includes(status.processingState)) {
                     reject(new BuildProcessingError(status.processingState));
-                }else{
+                } else {
                     resolve();
                 }
             }
@@ -244,11 +246,11 @@ export class BuildClient implements BuildClientInterface {
             },
             'responseType':    'json',
             'throwHttpErrors': false,
-            json: {
+            json:              {
                 data: {
-                    id: buildId,
+                    id:         buildId,
                     attributes: options,
-                    type: 'builds'
+                    type:       'builds'
                 }
             }
         });
@@ -256,5 +258,39 @@ export class BuildClient implements BuildClientInterface {
         if (response.statusCode >= 400) {
             throw new Error(`Error updating with id ${buildId}. Status code: ${response.statusCode}`)
         }
+    }
+
+    /**
+     * Gets a build
+     *
+     * @param {string} buildId
+     *
+     * @returns {Promise<BuildInterface>}
+     */
+    public async getBuild(buildId: string): Promise<BuildInterface> {
+        const response = await got.get(`${API_HOST}/v1/builds/${buildId}`, {
+            'headers':         {
+                'Authorization': `Bearer ${this.tokenProvider.getBearerToken()}`,
+                'Accept':        'application/json'
+            },
+            'responseType':    'json',
+            'throwHttpErrors': false,
+        });
+
+        if (response.statusCode >= 400) {
+            throw new Error(`Error updating with id ${buildId}. Status code: ${response.statusCode}`)
+        }
+
+        const json       = response.body as any;
+        const data       = json.data;
+
+        // noinspection UnnecessaryLocalVariableJS
+        const attributes: BuildInterface = {
+            ...data.attributes,
+            uploadedDate:   new Date(data.attributes.uploadedDate),
+            expirationDate: new Date(data.attributes.expirationDate)
+        };
+
+        return attributes;
     }
 }
