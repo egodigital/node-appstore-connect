@@ -177,7 +177,7 @@ export class Client implements BuildClientInterface, ReleaseClientInterface, Tes
      * @param {PlatformType} platform
      * @param {string} buildNumber
      */
-    public getBuildId(appId: number, version: string, platform: PlatformType, buildNumber?: number): Promise<string> {
+    public getBuildId(appId: number, version: string, platform: PlatformType, buildNumber?: number | string): Promise<string> {
         return this.buildClient.getBuildId(appId, version, platform, buildNumber);
     }
 
@@ -198,7 +198,7 @@ export class Client implements BuildClientInterface, ReleaseClientInterface, Tes
      * @param {PlatformType} platform
      * @param {string} buildNumber
      */
-    public getBuildStatus(appId: number, version: string, platform: PlatformType, buildNumber?: number) {
+    public getBuildStatus(appId: number, version: string, platform: PlatformType, buildNumber?: number | string) {
         return this.buildClient.getBuildStatus(appId, version, platform, buildNumber);
     }
 
@@ -215,7 +215,7 @@ export class Client implements BuildClientInterface, ReleaseClientInterface, Tes
      *
      * @return {Promise<void>}
      */
-    public waitForBuildProcessingToComplete(appId: number, platform: PlatformType, version: string, buildNumber: number, options?: WaitForBuildProcessingOptions): Promise<void> {
+    public waitForBuildProcessingToComplete(appId: number, platform: PlatformType, version: string, buildNumber: number | string, options?: WaitForBuildProcessingOptions): Promise<void> {
         return this.buildClient.waitForBuildProcessingToComplete(appId, platform, version, buildNumber, options);
     }
 
@@ -229,7 +229,7 @@ export class Client implements BuildClientInterface, ReleaseClientInterface, Tes
      * @param {string} groupId
      * @param {TestflightAddBuildToExternalGroupOptions?} options
      */
-    public addBuildToExternalGroupByGroupId(appId: number, version: string, platform: PlatformType, buildNumber: number, groupId: string, options?: TestflightAddBuildToExternalGroupOptions): Promise<void> {
+    public addBuildToExternalGroupByGroupId(appId: number, version: string, platform: PlatformType, buildNumber: number | string, groupId: string, options?: TestflightAddBuildToExternalGroupOptions): Promise<void> {
         return this.testflightClient.addBuildToExternalGroupByGroupId(appId, version, platform, buildNumber, groupId, options);
     }
 

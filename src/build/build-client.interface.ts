@@ -22,10 +22,10 @@ import {BuildUpdateOptions} from "./build-update-options";
 import {BuildInterface} from "./build.interface";
 
 export interface BuildClientInterface {
-    getBuildId(appId: number, version: string, platform: PlatformType, buildNumber?: number): Promise<string>;
+    getBuildId(appId: number, version: string, platform: PlatformType, buildNumber?: number | string): Promise<string>;
     getBuildStatusFromBuildId(buildId: string): Promise<BuildStatus>;
-    getBuildStatus(appId: number, version: string, platform: PlatformType, buildNumber?: number): Promise<BuildStatus>;
-    waitForBuildProcessingToComplete(appId: number, platform: PlatformType, version: string, buildNumber: number, options?: WaitForBuildProcessingOptions): Promise<void>;
+    getBuildStatus(appId: number, version: string, platform: PlatformType, buildNumber?: number | string): Promise<BuildStatus>;
+    waitForBuildProcessingToComplete(appId: number, platform: PlatformType, version: string, buildNumber: number | string, options?: WaitForBuildProcessingOptions): Promise<void>;
     updateBuild(buildId: string, options: BuildUpdateOptions): Promise<void>;
     getBuild(buildId: string): Promise<BuildInterface>;
 }

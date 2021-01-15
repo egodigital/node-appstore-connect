@@ -21,7 +21,7 @@ import {TestflightNotifyBetaTestersOptions} from "./testflight-notify-beta-teste
 import {TestflightCreateGroupOptions} from "./testflight-create-group-options";
 
 export interface TestflightClientInterface {
-    addBuildToExternalGroupByGroupId(appId: number, version: string, platform: PlatformType, buildNumber: number, groupId: string, options?: TestflightAddBuildToExternalGroupOptions): Promise<void>;
+    addBuildToExternalGroupByGroupId(appId: number, version: string, platform: PlatformType, buildNumber: number | string, groupId: string, options?: TestflightAddBuildToExternalGroupOptions): Promise<void>;
     addBuildToExternalGroupByGroupIdAndBuildId(buildId: string, groupId: string): Promise<void>;
     addBuildToExternalGroupByBuildId(appId: number, buildId: string, groupName: string, options?: TestflightAddBuildToExternalGroupOptions): Promise<void>;
     notifyBetaTestersOfNewBuildByBuildId(buildId: string, options?: TestflightNotifyBetaTestersOptions): Promise<void>;

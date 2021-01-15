@@ -44,7 +44,7 @@ export class TestflightClient implements TestflightClientInterface {
      * @param {string} groupId
      * @param {TestflightAddBuildToExternalGroupOptions?} options
      */
-    public async addBuildToExternalGroupByGroupId(appId: number, version: string, platform: PlatformType, buildNumber: number, groupId: string, options?: TestflightAddBuildToExternalGroupOptions): Promise<void> {
+    public async addBuildToExternalGroupByGroupId(appId: number, version: string, platform: PlatformType, buildNumber: number | string, groupId: string, options?: TestflightAddBuildToExternalGroupOptions): Promise<void> {
 
         const buildId = await this.buildClient.getBuildId(appId, version, platform, buildNumber);
 

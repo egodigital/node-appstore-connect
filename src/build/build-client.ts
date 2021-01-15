@@ -43,7 +43,7 @@ export class BuildClient implements BuildClientInterface {
      * @param {PlatformType} platform
      * @param {string} buildNumber
      */
-    public async getBuildId(appId: number, version: string, platform: PlatformType, buildNumber?: number): Promise<string> {
+    public async getBuildId(appId: number, version: string, platform: PlatformType, buildNumber?: number | string): Promise<string> {
 
         const response = await got.get(`${API_HOST}/v1/builds`, {
             'headers':         {
@@ -126,7 +126,7 @@ export class BuildClient implements BuildClientInterface {
      * @param {PlatformType} platform
      * @param {string} buildNumber
      */
-    public async getBuildStatus(appId: number, version: string, platform: PlatformType, buildNumber?: number): Promise<BuildStatus> {
+    public async getBuildStatus(appId: number, version: string, platform: PlatformType, buildNumber?: number | string): Promise<BuildStatus> {
 
         const response = await got.get(`${API_HOST}/v1/builds`, {
             'headers':         {
@@ -178,7 +178,7 @@ export class BuildClient implements BuildClientInterface {
      *
      * @return {Promise<void>}
      */
-    public waitForBuildProcessingToComplete(appId: number, platform: PlatformType, version: string, buildNumber: number, options?: WaitForBuildProcessingOptions): Promise<void> {
+    public waitForBuildProcessingToComplete(appId: number, platform: PlatformType, version: string, buildNumber: number | string, options?: WaitForBuildProcessingOptions): Promise<void> {
 
         const opt                                       = options || {};
         const useOptions: WaitForBuildProcessingOptions = {
