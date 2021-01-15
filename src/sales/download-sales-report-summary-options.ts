@@ -15,8 +15,29 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './build';
-export * from './client';
-export * from './release';
-export * from './sales';
-export * from './testflight';
+import * as moment from "moment";
+import {SalesReportRowFilter} from "./sales-report-row-filter";
+import {DownloadSalesReportFrequency} from "./download-sales-report-frequency";
+
+
+/**
+ * Options for 'Client.downloadSalesReportSummary()' method.
+ */
+export interface DownloadSalesReportSummaryOptions {
+    /**
+     * The custom report date.
+     */
+    'date'?: moment.MomentInput;
+    /**
+     * A filter for a sales report row.
+     */
+    'filter'?: SalesReportRowFilter;
+    /**
+     * The frequency. Default: Weekly.
+     */
+    'frequency'?: DownloadSalesReportFrequency;
+    /**
+     * The ID of the vendor.
+     */
+    'vendorId': string;
+}

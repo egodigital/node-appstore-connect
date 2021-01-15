@@ -15,8 +15,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './build';
-export * from './client';
-export * from './release';
-export * from './sales';
-export * from './testflight';
+export interface BuildInterface {
+    expired: boolean,
+    minOsVersion: string,
+    iconAssetToken: {
+        templateUrl: string,
+        height: number,
+        width: number
+    }
+    usesNonExemptEncryption: boolean,
+    uploadedDate: Date,
+    expirationDate: Date
+}

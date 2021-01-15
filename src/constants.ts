@@ -15,8 +15,4 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './build';
-export * from './client';
-export * from './release';
-export * from './sales';
-export * from './testflight';
+export const API_HOST = "https://api.appstoreconnect.apple.com"

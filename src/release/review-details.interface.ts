@@ -15,8 +15,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './build';
-export * from './client';
-export * from './release';
-export * from './sales';
-export * from './testflight';
+export interface ReviewDetailsInterface {
+    contactEmail?: string;
+    contactFirstName?: string;
+    contactLastName?: string;
+    contactPhone?: string;
+    demoAccountName?: string;
+    demoAccountPassword?: string;
+    demoAccountRequired?: string;
+    notes?: string;
+}

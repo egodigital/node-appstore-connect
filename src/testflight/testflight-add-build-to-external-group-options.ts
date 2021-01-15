@@ -15,8 +15,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './build';
-export * from './client';
-export * from './release';
-export * from './sales';
-export * from './testflight';
+import {TestflightNotifyBetaTestersOptions} from "./testflight-notify-beta-testers-options";
+
+export interface TestflightAddBuildToExternalGroupOptions {
+    notifyBetaTestersThereIsANewBuild?: boolean;
+    notifyOptions?: TestflightNotifyBetaTestersOptions,
+
+    /**
+     * @default {true}
+     */
+    createGroupIfNotExists?: boolean;
+}

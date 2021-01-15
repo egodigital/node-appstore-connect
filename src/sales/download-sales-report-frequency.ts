@@ -15,8 +15,24 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './build';
-export * from './client';
-export * from './release';
-export * from './sales';
-export * from './testflight';
+/**
+ * The frequency of a report.
+ */
+export enum DownloadSalesReportFrequency {
+    /**
+     * Daily
+     */
+    Daily = 'DAILY',
+    /**
+     * Monthly
+     */
+    Monthly = 'MONTHLY',
+    /**
+     * Weekly
+     */
+    Weekly = 'WEEKLY',
+    /**
+     * Yearly
+     */
+    Yearly = 'YEARLY',
+}

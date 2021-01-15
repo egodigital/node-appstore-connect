@@ -3,3 +3,5 @@ node_modules/
 lib/
 doc/
 src/sandbox.ts
+src/auth-key.p8
+.idea/

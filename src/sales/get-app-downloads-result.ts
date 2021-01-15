@@ -15,8 +15,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './build';
-export * from './client';
-export * from './release';
-export * from './sales';
-export * from './testflight';
+/**
+ * Result of a 'Client.getAppDownloads()' method call.
+ */
+import {GetAppDownloadsAppItem} from "./get-app-downloads-app-item";
+
+export interface GetAppDownloadsResult {
+    /**
+     * The list of apps.
+     */
+    'apps': { [appId: string]: GetAppDownloadsAppItem };
+}

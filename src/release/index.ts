@@ -15,8 +15,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './build';
-export * from './client';
-export * from './release';
-export * from './sales';
-export * from './testflight';
+export * from './submit-for-review-options';
+export * from './create-version-options';
+export * from './ensure-version-options';
+export * from './review-details.interface';
+export * from './localization.interface';
+export * from './localization-attributes.interface';
+export * from './version-update-options';
+export * from './release-notes.interface';

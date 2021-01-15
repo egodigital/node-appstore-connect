@@ -15,8 +15,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './build';
-export * from './client';
-export * from './release';
-export * from './sales';
-export * from './testflight';
+export enum BuildProcessingState {
+    // Unknown occurs when build does not show up either because it does not exist or because it is not yet shown
+    UNKNOWN    = "UNKNOWN",
+    PROCESSING = "PROCESSING",
+    FAILED     = "FAILED",
+    INVALID    = "INVALID",
+    VALID      = "VALID",
+}
